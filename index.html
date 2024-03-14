@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Search Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        #container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        h3 {
+            text-align: center;
+            color: white;
+        }
+
+        #wordSearchTable {
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+
+        td {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #000000;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .selected {
+            background-color: #0077be;
+        }
+
+        #wordList {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #901b13;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #words {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #words li {
+            margin-bottom: 5px;
+            padding: 5px;
+            background-color: #e6e6e6;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <h1>शब्द खोज पहेली </h1>
+
+    <table id="wordSearchTable">
+    </table>
+
+    <div id="wordList">
+        <h3>शब्द की सूची </h3>
+        <ul id="words">
+            <li>ब्लूबेरी</li>
+            <li>कद्दू</li>
+            <li>अरुगुला</li>
+            <li>बादाम</li>
+            <li>काली</li>
+            <li>मिर्च</li>
+            <li>अखरोट</li>
+            <li>पालक</li>
+            <li>क्रेनबेरी</li>
+            <li>सिरका</li>
+            <li>शहद</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    // Create a 2D array to represent the grid
+    const grid = [
+        ["पा", "प", "ल", "न", "ज", "न", "ल", "ए", "र", "ही", "स"],
+        ["द्व", "ल", "न", "का", "क्रे", "कु", "ह", "ग", "क", "द्य", "ऐ"],
+        ["ऋ", "अ", "क", "ली", "ण", "न", "शी", "ब", "अ", "य", "द्व"],
+        ["त्र", "रु", "झ", "मि", "झ", "घ", "बे", "का", "री", "ले", "खा"],
+        ["क", "गु", "ब", "र्च", "उ", "ए", "य", "री", "से", "ना", "मे"],
+        ["ग", "ला", "दु", "क", "द्", "दू", "बे", "णी", "ची", "का", "रू"],
+        ["ल", "ए", "र", "ही", "स", "लू", "फ", "लु", "क", "हि", "मा"],
+        ["श", "ह", "द", "न", "ब्", "कु", "ल", "म", "दि", "ना", "रा"],
+        ["ढ", "अ", "र", "ली", "ब", "लू", "न", "खी", "न", "मी", "रा"],
+        ["क", "क", "ख", "बा", "दा", "म", "ह", "ल", "नु", "मा", "न"],
+        ["सि", "रा", "म", "रो", "श्", "या", "म", "न", "का", "है", "रा"],
+        ["कु", "र", "ली", "ना", "ट", "नू", "पु", "र", "झो", "ड़", "मा"],
+        ["सि", "र", "का", "शी", "त", "ल", "ल", "व", "क", "य", "ई"],
+    ];
+
+    // Array to store the found words
+    let foundWords = [];
+
+    // Define a function to check if all words are found
+    function checkAllWordsFound() {
+        const wordListItems = document.querySelectorAll('#words li');
+        const foundWordsTexts = [...foundWords].map(word => word.textContent.trim());
+
+        // Check if all words are found
+        for (let i = 0; i < wordListItems.length; i++) {
+            if (!foundWordsTexts.includes(wordListItems[i].textContent.trim())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Display the grid
+    function displayGrid() {
+        const table = document.getElementById('wordSearchTable');
+        for (let i = 0; i < grid.length; i++) {
+            const row = document.createElement('tr');
+            for (let j = 0; j < grid[i].length; j++) {
+                const cell = document.createElement('td');
+                cell.textContent = grid[i][j];
+                row.appendChild(cell);
+            }
+            table.appendChild(row);
+        }
+    }
+
+    // Attach event listeners to the cells
+    function attachEventListeners() {
+        const cells = document.getElementsByTagName('td');
+        for (let i = 0; i < cells.length; i++) {
+            cells[i].addEventListener('click', handleCellClick);
+        }
+    }
+
+    function handleCellClick(event) {
+        const cell = event.target;
+        if (cell.classList.contains('selected')) {
+            cell.classList.remove('selected');
+        } else {
+            cell.classList.add('selected');
+        }
+
+        // Check if any word is completed
+        const selectedCells = document.querySelectorAll('.selected');
+        const selectedWord = Array.from(selectedCells).map(cell => cell.textContent).join('');
+        const wordListItems = document.querySelectorAll('#words li');
+        wordListItems.forEach(word => {
+            if (word.textContent.trim() === selectedWord && !foundWords.includes(word)) {
+                foundWords.push(word);
+            }
+        });
+
+        // Check if all words are found
+        if (checkAllWordsFound()) {
+            alert('Congratulations! You have found all the words.');
+        }
+    }
+
+    // Main function to initialize the game
+    function initializeGame() {
+        displayGrid();
+        attachEventListeners();
+    }
+
+    // Run the game
+    initializeGame();
+</script>
+
+</body>
+</html>
